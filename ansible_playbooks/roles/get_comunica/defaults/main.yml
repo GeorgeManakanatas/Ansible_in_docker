@@ -1,0 +1,5 @@
+---
+  comunica_folder_path: "/server"
+  comunica_git_url: "https://github.com/comunica/comunica.git"
+  widget_folder_path: "/widget"
+  widget_git_url: "https://github.com/comunica/jQuery-Widget.js"

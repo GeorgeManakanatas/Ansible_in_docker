@@ -1,0 +1,78 @@
+---
+  - name: "Check if comunica folder exists"
+    stat:
+      path: "{{ playbook_dir }}{{ comunica_folder_path }}"
+    register: comunica_server_code
+    tags: ["comunica","get_comunica"]
+
+  - name: "Create comunica folder"
+    file:
+      path: "{{ playbook_dir }}{{ comunica_folder_path }}"
+      state: directory
+      mode: 0775
+      recurse: yes
+    when: comunica_server_code.stat.exists == False
+    become: true
+    become_method: sudo
+    tags: ["comunica","get_comunica"]
+
+  - name: "Pull comunica from git"
+    git:
+      repo: "{{ comunica_git_url }}"
+      dest: "{{ playbook_dir }}{{ comunica_folder_path }}"
+    when: comunica_server_code.stat.exists == False
+    become: true
+    become_method: sudo
+    tags: ["comunica","get_comunica"]
+
+  - name: "Install comunica"
+    yarn:
+      path: "{{ playbook_dir }}{{ comunica_folder_path }}"
+    when: comunica_server_code.stat.exists == False
+    become: true
+    become_method: sudo
+    tags: ["comunica","get_comunica"]
+
+  - name: "Create browser widget folder"
+    file:
+      path: "{{ playbook_dir }}{{ widget_folder_path }}"
+      state: directory
+      mode: 0777
+      recurse: yes
+    when: comunica_server_code.stat.exists == False
+    become: true
+    become_method: sudo
+    tags: ["comunica","get_comunica"]
+
+  - name: "Pull browser widget from git"
+    git:
+      repo: "{{ widget_git_url }}"
+      dest: "{{ playbook_dir }}{{ widget_folder_path }}"
+    when: comunica_server_code.stat.exists == False
+    become: true
+    become_method: sudo
+    tags: ["comunica","get_comunica"]
+
+  - name: "Install browser widget"
+    yarn:
+      path: "{{ playbook_dir }}{{ widget_folder_path }}"
+    when: comunica_server_code.stat.exists == False
+    become: true
+    become_method: sudo
+    tags: ["comunica","get_comunica"]
+
+  - name: "change permissions of files and folders in comunica"
+    file:
+      path: "{{ playbook_dir }}"
+      recurse: yes
+      mode: 0777
+    become: true
+    become_method: sudo
+    tags: ["comunica","get_comunica"]
+    
+  - name: "Start browser widget"
+    command: "{{ playbook_dir }}{{ widget_folder_path }}/yarn run dev &"
+    when: comunica_server_code.stat.exists == False
+    become: true
+    become_method: sudo
+    tags: ["comunica","get_comunica"]
